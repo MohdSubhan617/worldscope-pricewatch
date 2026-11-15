@@ -40,7 +40,7 @@ Legend: VERIFIED = observed with output in this session; UNVERIFIED = not observ
 
 ## UNVERIFIED
 - The scheduled (cron) triggers have not fired yet; only manual dispatch was run.
-- Pages deployment of the v0.1.1 code (blocked, see above); the daily data job itself works.
+- The Pages deploy of the commits made after the rewrite (this branch) is verified only once its publish run is green; see the final report.
 - Denylist step (c) is skipped in CI by design (the file is local-only), so CI never checks it.
 - The daily export (`pricewatch run`) refits its own model daily and does not load the champion;
   the champion registry is only exercised by the weekly job (decision 008).
