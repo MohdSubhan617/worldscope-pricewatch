@@ -29,4 +29,8 @@ cd site && npm ci && npm test && npm run build
 
 See `ENGINEERING_STANDARDS.md`, `AGENTS.md` and `docs/decisions/`.
 
+## Built with
+
+This project was built with AI assistance from Claude Code.
+
 License: Apache-2.0.
