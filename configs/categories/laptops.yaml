@@ -8,3 +8,5 @@ annual_depreciation: 0.22
 promo_rate_per_month: 0.30
 promo_depth_mean: 0.10
 refresh_cycle_days: 365
+sale_depth: 0.12
+cycle_cut: 0.10

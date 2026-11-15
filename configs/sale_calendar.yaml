@@ -1,0 +1,7 @@
+# Public, scheduled sale events (SIMULATED). Each recurs every year on the same month/day.
+# These are planted effects: documented assumptions of the simulator, not real retail calendars.
+events:
+  - {name: Spring Sale, month: 3, day: 8, duration_days: 10}
+  - {name: Midsummer Sale, month: 7, day: 10, duration_days: 7}
+  - {name: Back to School, month: 8, day: 20, duration_days: 12}
+  - {name: Harvest Friday, month: 11, day: 22, duration_days: 9}
