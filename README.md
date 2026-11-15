@@ -13,6 +13,8 @@ claims of calibration to real data. Not financial advice.
 - Planted simulator effects (documented assumptions, not real-world claims): a scheduled sale
   calendar and age-based clearance cuts. A test requires the model to recover them (>=25%
   relative Brier reduction vs the base rate) and a control without them must not.
+- `pricewatch backtest` writes BENCHMARKS.md (rolling-origin, purge + embargo); `pricewatch retrain`
+  applies a champion/challenger promotion policy; drift is checked with PSI/KS.
 - Static site (strict TypeScript, no runtime dependencies) on GitHub Pages. Data commits go to
   the orphan `data` branch, never `main`.
 
