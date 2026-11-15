@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "worldscope-pricewatch"
-version = "0.1.0"
+version = "0.1.1"
 description = "Calibrated probabilities that a simulated electronics price drops within 14 days."
 readme = "README.md"
 requires-python = ">=3.11"
