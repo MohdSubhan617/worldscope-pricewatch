@@ -1,0 +1,12 @@
+:root { color-scheme: light dark; --bg:#fff; --fg:#1b1f24; --accent:#2563eb; --warn:#fde68a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#12161c; --fg:#e6e8eb; --accent:#60a5fa; --warn:#5b4a12; } }
+body { margin:0 auto; max-width:60rem; padding:1rem; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui,sans-serif; }
+.banner { background:var(--warn); padding:.5rem .75rem; border-radius:.4rem; }
+nav { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; }
+button { font:inherit; padding:.3rem .8rem; border:1px solid var(--accent); background:none; color:var(--fg); border-radius:.4rem; cursor:pointer; }
+table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:.4rem; border-bottom:1px solid #8884; }
+tr[tabindex]:focus,tr[tabindex]:hover { outline:2px solid var(--accent); }
+.bar { display:inline-block; height:.7rem; background:var(--accent); border-radius:.2rem; vertical-align:middle; }
+.pct { margin-left:.5rem; }
+svg { width:100%; max-width:30rem; } svg path { fill:none; stroke:var(--accent); stroke-width:2; }
+footer { margin-top:2rem; font-size:.85rem; opacity:.8; }

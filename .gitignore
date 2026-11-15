@@ -17,3 +17,4 @@ work/
 .local/
 .env
 .env.*
+site/build-test/
