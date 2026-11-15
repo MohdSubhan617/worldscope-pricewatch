@@ -1,0 +1,40 @@
+name: weekly-retrain
+on:
+  schedule:
+    - cron: "41 4 * * 0"   # Sundays
+  workflow_dispatch:
+permissions:
+  contents: write   # pushes model state to the orphan `data` branch only
+concurrency:
+  group: publish        # shares the group with publish.yml so data-branch pushes never race
+  cancel-in-progress: false
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - name: Attach data branch
+        run: |
+          git fetch origin data
+          git worktree add -B data data-branch origin/data
+      - name: Fit challenger, apply promotion policy
+        env:
+          PRICEWATCH_DATA_DIR: data-branch/state
+        run: pricewatch retrain --state data-branch/state | tee retrain.txt
+      - name: Check every JSON file is marked simulated
+        run: python tools/check_simulated.py data-branch/state/models
+      - name: Commit model state to data branch
+        working-directory: data-branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "models: weekly retrain $(date -u +%F)"
+            git push origin HEAD:data
+          fi
