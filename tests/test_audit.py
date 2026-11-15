@@ -117,7 +117,10 @@ def test_email_check_flags_non_noreply_committer(tmp_path: Path) -> None:
     _git(repo, "commit", "-qm", "bad", env={"GIT_COMMITTER_EMAIL": "real.person@example.com"})
     result = step_emails(repo)
     assert result.status == "FAIL"
-    assert "committer" in " ".join(result.problems)
+    text = " ".join(result.problems) + result.note
+    assert "committer" in text
+    assert "real.person" not in text  # the address itself must never reach (public) logs
+    assert "withheld" in text
 
 
 @pytest.mark.parametrize(
