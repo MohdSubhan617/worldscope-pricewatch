@@ -1,4 +1,4 @@
-﻿# WorldScope PriceWatch
+# WorldScope PriceWatch
 
 Calibrated probabilities that a **simulated** electronics item's price drops by at least 5%
 within 14 days. Everything here is **simulated**: the catalogue is fictional (no real brands or
