@@ -9,6 +9,7 @@ permissions:
   contents: write   # push data commits to the orphan `data` branch only
   pages: write
   id-token: write
+  issues: write     # daily digest comment and failure alerts (built-in token only)
 concurrency:
   group: publish
   cancel-in-progress: false
@@ -46,6 +47,21 @@ jobs:
           git add -A
           git commit -m "data: simulated day $(python -c "import json;print(json.load(open('state/clock.json'))['today'])")"
           git push origin HEAD:data
+      - name: Post daily digest as a comment on the monthly issue
+        # A failed digest must never fail the data run; the data was already committed.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python tools/digest.py data-branch/public "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > digest.md
+          title="Daily report $(date -u +%Y-%m)"
+          num=$(gh issue list --state open --limit 50 --json number,title --jq ".[] | select(.title==\"$title\") | .number" | head -n1)
+          if [ -z "$num" ]; then
+            url=$(gh issue create --title "$title" --body "Monthly thread of daily digests. All figures are SIMULATED.")
+            num="${url##*/}"
+          fi
+          gh issue comment "$num" --body-file digest.md
   deploy:
     needs: [data]
     if: ${{ !cancelled() && (needs.data.result == 'success' || needs.data.result == 'skipped') }}
@@ -84,3 +100,20 @@ jobs:
           path: site/build/site
       - id: deploy
         uses: actions/deploy-pages@v4
+  notify-failure:
+    # Failure-only notification: silent on success. Opens (or comments on) one alert issue.
+    needs: [data, deploy]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          title="Pipeline failure alerts"
+          run="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          body="publish workflow failed ($GITHUB_EVENT_NAME) on $(date -u +%FT%TZ): $run"
+          num=$(gh issue list --state open --limit 50 --json number,title --jq ".[] | select(.title==\"$title\") | .number" | head -n1)
+          if [ -z "$num" ]; then gh issue create --title "$title" --body "$body"; else gh issue comment "$num" --body "$body"; fi
