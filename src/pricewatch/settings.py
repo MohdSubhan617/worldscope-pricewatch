@@ -18,6 +18,7 @@ class Settings(BaseModel):
     horizon_days: int = Field(default=14, ge=1)
     data_dir: Path = Path("work/data")
     config_dir: Path = Path("configs/categories")
+    calendar_path: Path = Path("configs/sale_calendar.yaml")
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> Settings:
