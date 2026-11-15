@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write   # pushes model state to the orphan `data` branch only
+  issues: write     # failure-only alert issue (built-in token)
 concurrency:
   group: publish        # shares the group with publish.yml so data-branch pushes never race
   cancel-in-progress: false
@@ -38,3 +39,20 @@ jobs:
             git commit -m "models: weekly retrain $(date -u +%F)"
             git push origin HEAD:data
           fi
+  notify-failure:
+    # Failure-only notification: silent on success. Opens (or comments on) one alert issue.
+    needs: [retrain]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          title="Pipeline failure alerts"
+          run="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          body="weekly-retrain workflow failed ($GITHUB_EVENT_NAME) on $(date -u +%FT%TZ): $run"
+          num=$(gh issue list --state open --limit 50 --json number,title --jq ".[] | select(.title==\"$title\") | .number" | head -n1)
+          if [ -z "$num" ]; then gh issue create --title "$title" --body "$body"; else gh issue comment "$num" --body "$body"; fi
