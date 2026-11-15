@@ -4,16 +4,19 @@ Everything here is **simulated data**; no result says anything about real prices
 Legend: VERIFIED = observed with output in this session; UNVERIFIED = not observed or only partly.
 
 ## Blocking / open
-- [ ] **Pages redeploy is blocked.** Audit step (d) fails on 4 commits on `main` (the PR merges
-      made with GitHub "rebase and merge": committer was the owner's private email, not noreply).
-      `publish.yml` keeps step (d) blocking, so the deploy job fails and notify-failure fires.
-      The live site still serves the v0.1.0 build with data from the last successful deploy.
-      Needs the owner's decision: rewrite those 4 commits (committer field only, trees identical)
-      and force-push `main`. A rewrite was attempted and refused by the permission system.
-      GitHub may keep the old objects reachable by SHA until its own GC; scrubbing needs GitHub
-      Support. Also enable "Keep my email addresses private" + "Block command line pushes that
-      expose my email" in GitHub email settings. See decisions/006.
-- [ ] The v0.1.1 tag therefore points at a history that fails audit step (d).
+- [ ] **Old commits may still be reachable.** History was rewritten and force-pushed (decision
+      006), but GitHub can keep the old commits reachable by SHA and through
+      `refs/pull/*/head` until it purges them. The owner must ask GitHub Support to purge them.
+      NOT resolved.
+- [ ] **Contributors list.** Claude trailers were removed from all commits, but the contributors
+      list can take hours to refresh. Not yet observed to update.
+- [ ] **Local backup branches** `backup-before-rewrite` and `backup-before-rewrite-data` hold the
+      old commits (with the private email). Local only, never pushed; the owner deletes them
+      after confirming.
+- [ ] Owner-side: enable "Keep my email addresses private" and "Block command line pushes that
+      expose my email" in GitHub email settings.
+- [x] Pages redeploy: after the rewrite, audit step (d) passes in CI and the deploy job went
+      through; the live site serves `data/index.json` with `simulated: true`.
 
 ## VERIFIED (with output)
 - Python: ruff, ruff format, mypy --strict, pytest (see CI) green on `main` before release.
@@ -29,8 +32,9 @@ Legend: VERIFIED = observed with output in this session; UNVERIFIED = not observ
 - Failure-only notification fired on a real failure (issue "Pipeline failure alerts").
 - Playwright + axe (WCAG 2.0/2.1 A+AA): light, dark, 360px viewport, after interaction;
   control proves axe reports violations. Passed locally (Edge) and in CI (Chromium).
-- Audit steps a, b, c passed on the real repo with the real denylist (1 term; all branches
-  incl. `data`); test plants a term in a temp repo and asserts failure. Step d failed as above.
+- Audit steps a, b, c, d passed on a fresh clone of the rewritten repo with the real denylist
+  (1 term; main and data); a test plants a term in a temp repo and asserts failure. Step e
+  (no Co-Authored-By / Claude-Session trailers) was added with tests.
 - No non-noreply address is printed by the audit; 8 earlier workflow runs whose public logs had
   printed it were deleted.
 
