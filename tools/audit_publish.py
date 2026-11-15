@@ -8,6 +8,7 @@ Steps (each prints PASS / FAIL / SKIP):
       Skipped with a warning if the file is absent or --skip-denylist is given.
       Matching terms are never printed, only "term #N" with the path and commit.
   (d) every commit author and committer email is a GitHub noreply address
+  (e) no commit message on any branch carries a Co-Authored-By or Claude-Session trailer
 """
 
 from __future__ import annotations
@@ -208,6 +209,22 @@ def step_emails(root: Path) -> StepResult:
     )
 
 
+TRAILER = re.compile(r"^\s*(co-authored-by|claude-session)\s*:", re.IGNORECASE | re.MULTILINE)
+
+
+def step_trailers(root: Path) -> StepResult:
+    problems: list[str] = []
+    for rec in _git(root, "log", "--all", "--format=%H%x1f%B%x1e").split("\x1e"):
+        if not rec.strip():
+            continue
+        sha, _, body = rec.strip("\n").partition("\x1f")
+        for match in TRAILER.finditer(body):
+            problems.append(f"{sha[:10]}: forbidden trailer '{match.group(1).lower()}' in message")
+    return StepResult(
+        "e: no Co-Authored-By / Claude-Session trailers", "FAIL" if problems else "PASS", problems
+    )
+
+
 def run_audit(
     root: Path, denylist: Path | None = None, skip_denylist: bool = False
 ) -> list[StepResult]:
@@ -216,6 +233,7 @@ def run_audit(
         step_brands(root),
         step_denylist(root, denylist, skip_denylist),
         step_emails(root),
+        step_trailers(root),
     ]
 
 

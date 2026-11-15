@@ -9,3 +9,8 @@
 - Data commits go to the orphan `data` branch, never `main`.
 - Simulator parameters are documented assumptions, not claims of calibration to real data.
 - Decisions that deviate from or fill gaps in the brief go in `docs/decisions/NNN-title.md`.
+- Commits carry no Co-Authored-By / Claude-Session trailers (`.claude/settings.json` blanks the
+  attribution; `.githooks/commit-msg` rejects them; audit step (e) fails on them).
+- Merge by local `git merge --ff-only <branch>` then `git push origin main`. Never use GitHub's
+  "rebase and merge" or "squash" buttons: they stamp a non-noreply committer (decision 006).
+

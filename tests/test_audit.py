@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from tools.audit_publish import audit, run_audit, step_denylist, step_emails
+from tools.audit_publish import audit, run_audit, step_denylist, step_emails, step_trailers
 
 NOREPLY = "1+tester@users.noreply.github.com"
 ENV = {
@@ -134,3 +134,25 @@ def test_email_check_accepts_github_noreply_identities(tmp_path: Path, email: st
     _git(repo, "add", "-A")
     _git(repo, "commit", "-qm", "ok", env={"GIT_COMMITTER_EMAIL": email})
     assert step_emails(repo).status == "PASS"
+
+
+@pytest.mark.parametrize(
+    "trailer",
+    ["Co-Authored-By: Someone <x@example.com>", "co-authored-by: lower", "Claude-Session: abc123"],
+)
+def test_trailer_step_fails_on_forbidden_trailers_in_any_branch(
+    tmp_path: Path, trailer: str
+) -> None:
+    repo = tmp_path / "r"
+    repo.mkdir()
+    _repo(repo, {"README.md": "simulated"})
+    assert step_trailers(repo).status == "PASS"
+    _git(repo, "checkout", "-q", "-b", "side")
+    (repo / "q.txt").write_text("x", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", f"feat: thing\n\nbody\n\n{trailer}")
+    _git(repo, "checkout", "-q", "main")
+    result = step_trailers(repo)
+    assert result.status == "FAIL"
+    assert "forbidden trailer" in " ".join(result.problems)
+    assert any(r.status == "FAIL" for r in run_audit(repo, skip_denylist=True))

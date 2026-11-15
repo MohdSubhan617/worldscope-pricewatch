@@ -1,0 +1,6 @@
+#!/bin/sh
+# Reject AI/co-author trailers (the repo's contributors list must not show them).
+if grep -qiE '^[[:space:]]*(co-authored-by|claude-session)[[:space:]]*:' "$1"; then
+  echo "commit-msg: Co-Authored-By / Claude-Session trailers are not allowed in this repo." >&2
+  exit 1
+fi
