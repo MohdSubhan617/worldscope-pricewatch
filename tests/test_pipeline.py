@@ -14,7 +14,11 @@ ROOT = Path(__file__).resolve().parent.parent
 
 @pytest.mark.slow
 def test_run_exports_simulated_json_and_advances_clock(tmp_path: Path) -> None:
-    s = Settings(data_dir=tmp_path / "data", config_dir=ROOT / "configs" / "categories")
+    s = Settings(
+        data_dir=tmp_path / "data",
+        config_dir=ROOT / "configs" / "categories",
+        calendar_path=ROOT / "configs" / "sale_calendar.yaml",
+    )
     out = tmp_path / "out"
     today = run(s, out)
     assert today == initial_day(s) + timedelta(days=1)

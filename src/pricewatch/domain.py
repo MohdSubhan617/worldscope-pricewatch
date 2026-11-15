@@ -12,6 +12,15 @@ class Frozen(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
 
+class SaleEvent(Frozen):
+    """A recurring scheduled sale window (same month/day every year)."""
+
+    name: str
+    month: int = Field(ge=1, le=12)
+    day: int = Field(ge=1, le=28)
+    duration_days: int = Field(ge=1, le=60)
+
+
 class CategoryConfig(Frozen):
     """Config-driven category definition (loaded from YAML)."""
 
@@ -25,6 +34,8 @@ class CategoryConfig(Frozen):
     promo_rate_per_month: float = Field(ge=0, le=1)
     promo_depth_mean: float = Field(gt=0, lt=1)
     refresh_cycle_days: int = Field(ge=30)
+    sale_depth: float = Field(default=0.15, ge=0, lt=0.6)  # extra markdown during scheduled sales
+    cycle_cut: float = Field(default=0.10, ge=0, lt=0.5)  # permanent cut at 85% and 100% of cycle
 
 
 class Product(Frozen):

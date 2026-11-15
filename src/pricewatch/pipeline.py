@@ -20,6 +20,7 @@ from pricewatch.model import (
     reliability,
     split_by_time,
 )
+from pricewatch.sales import load_calendar
 from pricewatch.settings import Settings
 from pricewatch.simulator import simulate_all
 
@@ -40,9 +41,10 @@ def run(settings: Settings, out_dir: Path, advance: bool = True) -> date:
     clock_path = settings.data_dir / "clock.json"
     today = advance_clock(clock_path, settings) if advance else read_clock(clock_path, settings)
     cats = load_categories(settings.config_dir)
-    products, prices = simulate_all(cats, settings.seed, settings.start_date)
+    events = load_calendar(settings.calendar_path)
+    products, prices = simulate_all(cats, settings.seed, settings.start_date, events)
     prices = prices[prices["day"] <= today]
-    feats = build_features(prices, {p.sku: p.category for p in products}, settings.horizon_days)
+    feats = build_features(prices, products, cats, events, settings.horizon_days)
     labelled = feats.dropna(subset=["label"])
     train, cal, test = split_by_time(labelled, today, settings.horizon_days)
     model = fit(train, cal, settings.seed)
