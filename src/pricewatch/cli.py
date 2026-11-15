@@ -8,6 +8,7 @@ from pathlib import Path
 from pricewatch.backtest import render_markdown, timed_backtest
 from pricewatch.clock import initial_day
 from pricewatch.pipeline import labelled_features, run
+from pricewatch.retrain import retrain
 from pricewatch.settings import Settings
 
 
@@ -20,8 +21,18 @@ def main(argv: list[str] | None = None) -> int:
     b = sub.add_parser("backtest", help="rolling-origin backtest; writes a markdown report")
     b.add_argument("--out", type=Path, default=Path("BENCHMARKS.md"))
     b.add_argument("--embargo", type=int, default=7)
+    t = sub.add_parser("retrain", help="fit a challenger and promote it only by policy")
+    t.add_argument("--state", type=Path, default=None, help="state dir (default: data_dir)")
     args = parser.parse_args(argv)
     settings = Settings.from_env()
+    if args.command == "retrain":
+        report = retrain(settings, args.state or settings.data_dir)
+        print(f"retrain {report.as_of}: {report.action}")  # noqa: T201
+        if report.decision is not None:
+            print(f"  {report.decision.reason}")  # noqa: T201
+        drifted = [r.column for r in report.drift if r.drifted]
+        print(f"  drifted features: {drifted or 'none'}")  # noqa: T201
+        return 0
     if args.command == "backtest":
         labelled = labelled_features(settings, initial_day(settings))
         seed, horizon = settings.seed, settings.horizon_days
