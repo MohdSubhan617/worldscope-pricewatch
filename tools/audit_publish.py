@@ -194,8 +194,15 @@ def step_emails(root: Path) -> StepResult:
         for role, email in (("author", ae), ("committer", ce)):
             identities.add(email)
             if not (NOREPLY.match(email) or email == GITHUB_WEB_NOREPLY):
-                problems.append(f"{sha[:10]}: {role} email is not a noreply address: {email}")
-    note = "identities: " + ", ".join(sorted(identities))
+                domain = email.rsplit("@", 1)[-1]
+                problems.append(
+                    f"{sha[:10]}: {role} email is not a noreply address "
+                    f"(domain {domain}; address withheld from logs)"
+                )
+    # Only noreply identities are listed; anything else is counted, never printed (logs are public).
+    shown = sorted(e for e in identities if NOREPLY.match(e) or e == GITHUB_WEB_NOREPLY)
+    hidden = len(identities) - len(shown)
+    note = "identities: " + ", ".join(shown) + (f" (+{hidden} withheld)" if hidden else "")
     return StepResult(
         "d: author/committer emails are noreply", "FAIL" if problems else "PASS", problems, note
     )
