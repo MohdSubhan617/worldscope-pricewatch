@@ -1,6 +1,6 @@
 # 003 - v0.1 model is calibrated but shows no skill over the base rate
 
-Status: accepted, known limitation
+Status: superseded by 005 (limitation was real on the v0.1.0 run)
 
 On the first published run (simulated day 2026-11-02) the held-out Brier score was 0.1199 against
 0.1198 for a constant base-rate predictor; ECE was 0.014. Promotions in the simulator start as a
