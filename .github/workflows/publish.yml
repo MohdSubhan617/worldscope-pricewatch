@@ -76,7 +76,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python tools/check_simulated.py site/build/site/data
-      - name: Pre-publish audit (denylist step skipped: the file is local-only)
+      - name: "Pre-publish audit (denylist step skipped, file is local-only)"
         run: python tools/audit_publish.py --skip-denylist
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
