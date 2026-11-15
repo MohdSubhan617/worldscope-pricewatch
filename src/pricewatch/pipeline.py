@@ -36,6 +36,16 @@ def _write(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(body, indent=1, sort_keys=True), encoding="utf-8")
 
 
+def labelled_features(settings: Settings, as_of: date) -> pd.DataFrame:
+    """Features with observed labels for all prices up to `as_of` (used by the backtest)."""
+    cats = load_categories(settings.config_dir)
+    events = load_calendar(settings.calendar_path)
+    products, prices = simulate_all(cats, settings.seed, settings.start_date, events)
+    prices = prices[prices["day"] <= as_of]
+    feats = build_features(prices, products, cats, events, settings.horizon_days)
+    return feats.dropna(subset=["label"])
+
+
 def run(settings: Settings, out_dir: Path, advance: bool = True) -> date:
     """Run one simulated day and write JSON under out_dir. Returns the simulated 'today'."""
     clock_path = settings.data_dir / "clock.json"
