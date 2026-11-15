@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "worldscope-pricewatch"
+version = "0.1.0"
+description = "Calibrated probabilities that a simulated electronics price drops within 14 days."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+dependencies = [
+  "pydantic>=2.6,<3",
+  "pandas>=2.2,<3",
+  "numpy>=1.26,<3",
+  "scipy>=1.11,<2",
+  "scikit-learn>=1.4,<2",
+  "pyyaml>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.6",
+  "mypy>=1.10",
+  "pandas-stubs",
+  "types-PyYAML",
+]
+
+[project.scripts]
+pricewatch = "pricewatch.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pricewatch = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF", "T20", "ERA", "PT", "N", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "ERA001"]
+"tools/**" = ["S603", "S607"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["src", "tests", "tools"]
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "sklearn.*", "joblib.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["slow: end-to-end tests that train models"]

@@ -1,0 +1,10 @@
+id: laptops
+name: Laptops
+brands: [Kestrel Works, Ardent Labs, Pivotal]
+models_per_brand: 4
+launch_price_min: 500
+launch_price_max: 2200
+annual_depreciation: 0.22
+promo_rate_per_month: 0.30
+promo_depth_mean: 0.10
+refresh_cycle_days: 365
