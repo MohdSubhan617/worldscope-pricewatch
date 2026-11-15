@@ -1,0 +1,10 @@
+id: audio
+name: Earbuds & Headphones
+brands: [Soniq, Hushwave, Tempo Audio]
+models_per_brand: 5
+launch_price_min: 40
+launch_price_max: 380
+annual_depreciation: 0.28
+promo_rate_per_month: 0.45
+promo_depth_mean: 0.20
+refresh_cycle_days: 270

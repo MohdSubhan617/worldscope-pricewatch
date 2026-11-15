@@ -1,0 +1,10 @@
+id: phones
+name: Phones
+brands: [Voltrix, Nimbalo, Quorra]
+models_per_brand: 4
+launch_price_min: 300
+launch_price_max: 1100
+annual_depreciation: 0.30
+promo_rate_per_month: 0.35
+promo_depth_mean: 0.12
+refresh_cycle_days: 365

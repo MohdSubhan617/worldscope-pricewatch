@@ -1,0 +1,10 @@
+id: tablets
+name: Tablets
+brands: [Plateau, Lumen Slate, Orbitab]
+models_per_brand: 4
+launch_price_min: 200
+launch_price_max: 1000
+annual_depreciation: 0.25
+promo_rate_per_month: 0.30
+promo_depth_mean: 0.11
+refresh_cycle_days: 365
